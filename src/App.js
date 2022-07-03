@@ -1,31 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addItem, removeItem, setFilter } from 'Redux/store';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Section from 'components/Section';
 import ContactForm from './components/ContactForm';
 import ContactsList from './components/ContactsList';
 import Filter from './components/Filter';
 
 function App() {
-  const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-  const [contacts, setContacts] = useState(parsedContacts ?? []);
-  const [filter, setFilter] = useState('');
+  const contacts = useSelector(state => state.items);
+  const filter = useSelector(state => state.filter);
   const isFirstRender = useRef(true);
-
-  // useEffect(() => {
-  //   // console.log('читаємо дані');
-  //   const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-
-  //   if (parsedContacts) {
-  //     setContacts(parsedContacts);
-  //   }
-  // }, []);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
-
-    // console.log('записуємо дані');
+    // console.log('записуємо дані в localStorage');
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
@@ -35,24 +29,24 @@ function App() {
     );
 
     isContactInList
-      ? alert(`${contact.name} is already in contacts!`)
-      : setContacts(contacts => [contact, ...contacts]);
+      ? toast.warning(`"${contact.name}" is already in contacts!`)
+      : dispatch(addItem(contact));
   };
 
   const deleteContact = id => {
-    setContacts(contacts => contacts.filter(contact => contact.id !== id));
+    dispatch(removeItem(id));
   };
 
   const filterHandler = event => {
     const { value } = event.currentTarget;
-    setFilter(value);
+    dispatch(setFilter(value));
   };
 
   const filterReset = () => {
-    setFilter('');
+    dispatch(setFilter(''));
   };
 
-  const contactFiltration = () => {
+  const filteredContacts = () => {
     const normalizedFilter = filter.toLowerCase();
 
     return contacts.filter(contact =>
@@ -72,10 +66,11 @@ function App() {
           onClick={filterReset}
         />
         <ContactsList
-          contacts={contactFiltration()}
+          contacts={filteredContacts()}
           clickHandler={deleteContact}
         ></ContactsList>
       </Section>
+      <ToastContainer autoClose={3000} theme={'colored'} />
     </>
   );
 }
