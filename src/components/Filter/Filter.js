@@ -1,8 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { setFilter } from 'Redux/filter/slice';
 import s from './Filter.module.css';
 
-const Filter = ({ filter, onChange, onClick }) => {
+const Filter = () => {
+  const filter = useSelector(state => state.filter);
+  const dispatch = useDispatch();
+
+  const inputHandler = event => {
+    const { value } = event.currentTarget;
+    dispatch(setFilter(value));
+  };
+
+  const filterReset = () => {
+    dispatch(setFilter(''));
+  };
+
   return (
     <div className={s.wrapper}>
       <label htmlFor="filter" className={s.label}>
@@ -13,19 +25,13 @@ const Filter = ({ filter, onChange, onClick }) => {
         name="filter"
         value={filter}
         className={s.input}
-        onChange={onChange}
+        onChange={inputHandler}
       />
-      <button type="button" className={s.button} onClick={onClick}>
+      <button type="button" className={s.button} onClick={filterReset}>
         Clear
       </button>
     </div>
   );
-};
-
-Filter.propTypes = {
-  filter: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired,
 };
 
 export default Filter;

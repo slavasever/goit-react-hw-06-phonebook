@@ -1,12 +1,38 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
+import { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeItem } from 'Redux/items/slice';
 import ContactItem from 'components/ContactItem';
 
-const ContactList = ({ contacts, clickHandler }) => {
+const ContactList = () => {
+  const contacts = useSelector(state => state.items);
+  const filter = useSelector(state => state.filter);
+  const dispatch = useDispatch();
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    // console.log('записуємо дані в localStorage');
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const deleteContact = id => {
+    dispatch(removeItem(id));
+  };
+
+  const contactsFiltration = () => {
+    const normalizedFilter = filter.toLowerCase();
+
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  };
+
   return (
     <ul>
-      {contacts.map(contact => {
+      {contactsFiltration().map(contact => {
         const { id, name, number } = contact;
 
         return (
@@ -15,21 +41,12 @@ const ContactList = ({ contacts, clickHandler }) => {
             id={id}
             name={name}
             number={number}
-            onClick={clickHandler}
+            onClick={deleteContact}
           />
         );
       })}
     </ul>
   );
-};
-
-ContactList.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  clickHandler: PropTypes.func.isRequired,
 };
 
 export default ContactList;
