@@ -33,13 +33,13 @@ function ContactForm() {
     event.preventDefault();
 
     const form = event.currentTarget;
+    const id = nanoid();
     const name = form.elements.name.value;
     const number = form.elements.number.value;
-    const id = nanoid();
     const contact = { id, name, number };
 
     const isContactInList = contacts.some(
-      item => item.name.toLocaleLowerCase() === contact.name.toLocaleLowerCase()
+      item => item.name.toLowerCase() === name.toLowerCase()
     );
 
     if (isContactInList) {
