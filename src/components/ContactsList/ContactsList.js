@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ContactItem from 'components/ContactItem';
 
@@ -6,10 +6,10 @@ const ContactList = () => {
   const contacts = useSelector(state => state.items);
   const filter = useSelector(state => state.filter);
 
-  useEffect(() => {
-    // console.log('записуємо дані в localStorage');
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  // useEffect(() => {
+  //   // console.log('записуємо дані в localStorage');
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  // }, [contacts]);
 
   const contactsFiltration = () => {
     const normalizedFilter = filter.toLowerCase();

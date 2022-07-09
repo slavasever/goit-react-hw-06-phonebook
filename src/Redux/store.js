@@ -1,16 +1,44 @@
-// Варіант 1
-import { configureStore } from '@reduxjs/toolkit';
+// Варіант 1 (CreateSlice + redux-persist)
+
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import items from './items/slice';
 import filter from './filter/slice';
 
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage,
+};
+
+const rootReducer = combineReducers({ items, filter });
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: {
-    items,
-    filter,
-  },
+  reducer: persistedReducer,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
-// Варіант 2
+export const persistor = persistStore(store);
+
+// Варіант 2 (CreateAction, CreateReducer + localStorage)
+
 // import { configureStore, createAction, createReducer } from '@reduxjs/toolkit';
 
 // Забираємо дані з localStorage
